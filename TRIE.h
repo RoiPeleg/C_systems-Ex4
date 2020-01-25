@@ -10,8 +10,8 @@ typedef struct Node
     struct Node* options[LETTERS];
 } Node;
 
-boolean insert(Node** root,char* word);//insert a word
+void insert(Node* root,char* word);//insert a word
 
 int search(Node* root,char* word);//looks for given word and and returns number of occurrences 
 
-void del(Node** root);//realses all used memory of given TRIE
+void del(Node* root);//realses all used memory of given TRIE
