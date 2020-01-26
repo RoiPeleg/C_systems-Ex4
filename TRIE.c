@@ -1,7 +1,7 @@
 #include "TRIE.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <string.h>
 
 //assumes a word ends with \0
 //make all capital letters small and clears spaces and commas
@@ -9,7 +9,7 @@ void unCAP(char* word){
     while (*word != '\0')
     {   
         if('A' <= *word && *word <= 'Z'){
-            *word = *word + 'A';
+            *word = 'a' + *word - 'A';
         }
         if(*word == ' ' || *word == ',' || *word == '.')
         {
@@ -26,16 +26,13 @@ Node* getNewTRIE(char c){
     if(root==NULL)exit(1);
     root -> isWord = FALSE;
     root -> freq = -1;
-    root -> letter = c;
     for(size_t i = 0; i < LETTERS; i++)root -> options[i] = NULL;
     return root;    
 }
 
 void insert(Node* root,char* word){
     unCAP(word);
-    printf(" %s\n",word);
-    int ind = 0;
-    while (root && *word != '\0'){
+    while (*word != '\0'){
         if((root) -> options[*(word)-'a'] == NULL){
             (root) -> options[*(word)-'a'] = getNewTRIE(*(word));
             root = ((root) -> options[*(word)-'a']);
@@ -43,21 +40,43 @@ void insert(Node* root,char* word){
         else{
             root = ((root) -> options[*(word)-'a']);
         }
-        word += ind++;
+        word += 1;
     }
     if((root)->isWord){
-        (root) -> freq++;
+        (root) -> freq+=1;
     }
     else{
         (root) -> isWord = TRUE;
         (root) -> freq = 1;
     }
 }
-
-int search(Node* root,char* word){
-    return -1;
+void searchT(Node* root,boolean r,char word[],int count){
+    if(root == NULL){
+        return;
+    }
+    if(root->isWord){
+        for(int i=0;i<count;i++)
+        printf("%c",word[i]);
+        printf("\t%d\n",root->freq);
+    }
+    if(!r){
+        for(size_t i = 0; i < LETTERS; i++){
+            if(root->options[i]!=NULL){
+                word[count]= (char)('a'+i);
+                searchT(root -> options[i],r,word,count+1);
+            }
+        }
+    }
+    else
+    {
+        for(size_t i = 0; i < LETTERS; i++){
+            if(root->options[(LETTERS-(i+1))]!=NULL){
+                word[count]= (char)('a'+(LETTERS-(i+1)));
+                searchT(root -> options[(LETTERS-(i+1))],r,word,count+1);
+            }
+        }
+    }
 }
-
 void del(Node* root){
     if(root == NULL){
         return;
@@ -68,37 +87,20 @@ void del(Node* root){
     free(root);
 }
 
-void printNode(Node* n){
-    if(n == NULL)return;
-    printf("%c\n",n->letter);
-    for(size_t i = 0; i < LETTERS; i++){
-        printf(" %c",n ->options[i] ->letter);
+
+int main(int n,char* args[]){
+    boolean reverse = FALSE;
+    if(n==2 && strcmp(args[0],"r")){
+        reverse = TRUE;
     }
-    printf("\n");
-}
-void print(Node* root){
-    if(root == NULL){
-        return;
-    }
-    //printNode(root);
-    if(root->letter=='0'){
-    printf("%c\n",root->letter);
-    }
-    for(size_t i = 0; i < LETTERS; i++){
-        printf(" %c",root ->letter);
-       // printNode((root) -> options[i]);
-        print((root) -> options[i]);
-    }
-    printf("\n");
-}
-int main(int n, char* args[]){
     Node* root = getNewTRIE('0');
-    char word[50];
+    char word[50] = {'0'};
     while(fscanf(stdin," %49s",word) == 1){
         insert(root,word);
     }
-    print(root);
     fclose(stdin);
+    *word = '\0';
+    searchT(root,reverse,word,0);
     del(root);
     return 0;
 }

@@ -3,8 +3,7 @@
 typedef enum {FALSE=0, TRUE=1} boolean;
 
 typedef struct Node
-{
-    char letter;    
+{  
     boolean isWord;
     unsigned int freq;//frequncy of word
     struct Node* options[LETTERS];
@@ -12,6 +11,6 @@ typedef struct Node
 
 void insert(Node* root,char* word);//insert a word
 
-int search(Node* root,char* word);//looks for given word and and returns number of occurrences 
+void searchT(Node* root,boolean reserve,char word[],int count);//prints all words and freq
 
 void del(Node* root);//realses all used memory of given TRIE
