@@ -5,20 +5,20 @@
 
 //assumes a word ends with \0
 //make all capital letters small and clears spaces and commas
-void unCAP(char* word){
+void unCAP(char *word)
+{
     while (*word != '\0')
-    {   
-        if('A' <= *word && *word <= 'Z'){
+    {
+        if ('A' <= *word && *word <= 'Z')
+        {
             *word = 'a' + *word - 'A';
         }
-        if(*word == ' ' || *word == ',' || *word == '.')
-        {
-            *word = 0;
-        }
-        word = (word + 1);
+        else if(('a'> *word || *word > 'z')){
+            *word = ' ';
+        }      
+        word++;
     }
 }
-
 
 //creates a new TRIE node and retruns a pointer to it to create root c = 0 (0 indicates root).
 Node* getNewTRIE(char c){
@@ -32,7 +32,16 @@ Node* getNewTRIE(char c){
 
 void insert(Node* root,char* word){
     unCAP(word);
+        if(*word < 'a' || *word > 'z')
+        {
+            if(strlen(word)==1)return;
+        }
     while (*word != '\0'){
+        if(*word < 'a' || *word > 'z')
+        {
+            word++;
+            continue;
+        }
         if((root) -> options[*(word)-'a'] == NULL){
             (root) -> options[*(word)-'a'] = getNewTRIE(*(word));
             root = ((root) -> options[*(word)-'a']);
@@ -40,7 +49,7 @@ void insert(Node* root,char* word){
         else{
             root = ((root) -> options[*(word)-'a']);
         }
-        word += 1;
+        word ++;
     }
     if((root)->isWord){
         (root) -> freq+=1;
@@ -95,10 +104,12 @@ int main(int n,char* args[]){
     }
     Node* root = getNewTRIE('0');
     char word[50] = {'0'};
+    if(stdin){
     while(fscanf(stdin," %49s",word) == 1){
         insert(root,word);
     }
     fclose(stdin);
+    }
     *word = '\0';
     searchT(root,reverse,word,0);
     del(root);
